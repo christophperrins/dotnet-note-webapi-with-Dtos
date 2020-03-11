@@ -18,34 +18,37 @@ namespace src.Controllers
     {
 
         private readonly ILogger<NoteController> _logger;
+        private readonly IMapper _mapper;
         private readonly MyContext _context;
 
-        public NoteController(ILogger<NoteController> logger, MyContext context)
+        public NoteController(ILogger<NoteController> logger, IMapper mapper, MyContext context)
         {
             _logger = logger;
+            _mapper = mapper;
             _context = context;
         }
 
         [HttpGet]
-        public async Task<List<Note>> GetAll()
+        public async Task<List<NoteDto>> GetAll()
         {
-            return await _context.Note.ToListAsync();
+            List<Note> notes = await _context.Note.ToListAsync();
+            return _mapper.Map<List<NoteDto>>(notes);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<Note> GetAsync(int id)
+        public async Task<NoteDto> GetAsync(int id)
         {
-            return await _context.Note.FindAsync(id);
-            
+            Note note = await _context.Note.FindAsync(id);
+            return _mapper.Map<NoteDto>(note);
         }
 
         [HttpPost]
-        public async Note posty([FromBody] Note note)
+        public async Task<int> PostyAsync([FromBody] NoteDtoWithoutId noteDto)
         {
+            Note note = _mapper.Map<Note>(noteDto);
             _context.Note.Add(note);
-            await _context.SaveChangesAsync();
-            return note;
+            return await _context.SaveChangesAsync();
         }
 
         [HttpPut]
@@ -56,9 +59,17 @@ namespace src.Controllers
             return await _context.SaveChangesAsync();
         }
 
+        //[HttpPut]
+        //public async Task<int> PuttyAlso([FromBody] NoteDto noteDto)
+        //{
+        //    Note noteEntity = await _context.Note.FirstAsync(note => note.Id == noteDto.Id);
+        //    noteEntity.Text = noteDto.Text;
+        //    return await _context.SaveChangesAsync();
+        //}
+
         [HttpDelete]
         [Route("{id}")]
-        public async Task<int> delettyAsync(int id)
+        public async Task<int> DelettyAsync(int id)
         {
             Note note = await _context.Note.FindAsync(id);
             _context.Note.Remove(note);
