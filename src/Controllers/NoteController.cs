@@ -28,6 +28,14 @@ namespace src.Controllers
             _context = context;
         }
 
+        [HttpPost]
+        public async Task<int> PostyAsync([FromBody] NoteDtoWithoutId noteDto)
+        {
+            Note note = _mapper.Map<Note>(noteDto);
+            _context.Note.Add(note);
+            return await _context.SaveChangesAsync();
+        }
+
         [HttpGet]
         public async Task<List<NoteDto>> GetAll()
         {
@@ -41,14 +49,6 @@ namespace src.Controllers
         {
             Note note = await _context.Note.FindAsync(id);
             return _mapper.Map<NoteDto>(note);
-        }
-
-        [HttpPost]
-        public async Task<int> PostyAsync([FromBody] NoteDtoWithoutId noteDto)
-        {
-            Note note = _mapper.Map<Note>(noteDto);
-            _context.Note.Add(note);
-            return await _context.SaveChangesAsync();
         }
 
         [HttpPut]

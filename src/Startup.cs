@@ -41,9 +41,9 @@ namespace src
  
             configuration.AssertConfigurationIsValid();
             var mapper = configuration.CreateMapper();
+            services.AddSingleton<IMapper>(sp => mapper);
             
 
-            services.AddSingleton<IMapper>(sp => mapper);
             services.AddDbContext<MyContext>(options => options.UseMySql(Configuration.GetConnectionString("MySql")));
             services.AddControllers();
             services.AddSwaggerDocument();
